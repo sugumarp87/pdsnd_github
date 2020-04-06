@@ -220,7 +220,7 @@ def user_stats(df,city):
     # since Washington does not have gender or birth year data, this
     # conditional statement was used to only run calculations for other two
     # cities
-    if city != 'washington':
+    if city.lower() != 'washington':
         print('\nGenders:')
         print(df['Gender'].value_counts())
     else:

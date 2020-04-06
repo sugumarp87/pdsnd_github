@@ -38,6 +38,7 @@ def get_filters():
             print('Sorry, that\'s not an option. Please check spelling.')
 
     # get user input for month (all, january, february, ... , june)
+    #a while loop to handle invalid inputs
     while True:
         month = input('\nWhich month do you want data for?\n'\
         'Please enter All, Jan, Feb, Mar, Apr, May or Jun: ')
@@ -47,6 +48,7 @@ def get_filters():
             print('    Sorry, please enter a month between Jan-Jun or \"all".')
 
     # get user input for day of week (all, monday, tuesday, ... sunday)
+    # while loop to handle invalid inputs
     while True:
         day = input('\nWhich weekday do you want data for?\n'\
         'Please enter All, Mon, Tue, Wed, Thu, Fri, Sat or Sun: ')
@@ -92,6 +94,10 @@ def load_data(city, month, day):
     #print sample to show output of loading data
     print('SAMPLE OUTPUT OF DATA FRAME')
 
+    #had to use a conditional statement since washington does not have "Gender"
+    #and "Birth Year" columns.  I did not show all columns just for visual.
+    #This is purely for user experience.  Raw input option comes later that
+    #displays everything.
     if city.lower() == 'washington':
         print('\n',df[['Start Time','End Time', 'Trip Duration', 'User Type',
          'Month', 'Day_of_week']].head())
@@ -126,7 +132,10 @@ def time_stats(df):
     # display the most common start hour
     # count unique values of hour coln and rtn index instead of count value
     most_hour = df['Hour'].value_counts().idxmax()
-    if most_hour >= 13:
+
+    # In order to display AM and PM, I added this conditional to print AM for
+    # values less than 12 and for over 13, subtract 12 for PM.
+    if most_hour < 13:
         print('Most frequent travel hour: {}pm'.format(most_hour-12))
     else:
         print('Most frequent travel hour: {}am'.format(most_hour))
@@ -142,8 +151,11 @@ def station_stats(df):
     start_time = time.time()
 
     # display most commonly used start station
+    # comment below was code used to check actual value counts in order to
+    # make sure answer made sense.  See this mirrored for next two as well.
     #print(df['Start Station'].value_counts(),'\n')
 
+    # used .idxmax() to return index of max in value count output.
     most_start_stn = df['Start Station'].value_counts().idxmax()
     print('Most common start station: {}'.format(most_start_stn))
 
@@ -203,6 +215,9 @@ def user_stats(df,city):
     print(df['User Type'].value_counts())
 
     # Display counts of gender
+    # since Washington does not have gender or birth year data, this
+    # conditional statement was used to only run calculations for other two
+    # cities
     if city != 'washington':
         print('\nGenders:')
         print(df['Gender'].value_counts())
@@ -210,6 +225,7 @@ def user_stats(df,city):
         print('\nWashington does not have data on gender or birthdays.')
 
     # Display earliest, most recent, and most common year of birth
+    # same as genders above.  Washington will not run calculations.
     if city.lower() != 'washington':
         earliest_birth=df['Birth Year'].min()
         recent_birth=df['Birth Year'].max()
@@ -229,16 +245,24 @@ def display_data(df):
     print('-'*40)
     print('RAW DATA OUTPUT\n')
     see_more=input('Would you like to see 5 lines of raw data (Y/N)?: \n')
-    n = df['Start Time'].count()
-    a = 0
-    b = 5
 
+    # declared variables for while loop.
+    n = df['Start Time'].count()    # number of rows so max value for 'b'
+    a = 0   # lowerbound for df.iloc[] method
+    b = 5   # upperbound for df.iloc[] method
+
+    # infinite while loop that is only broken (rtn) if 'yes' is not provided.
     while True:
         if see_more.lower() not in ['y','yes']:
             print('-'*40)
             return
+            # loop is broken since 'y' or 'yes' are not selected
+
+        # loop until 'b' is 'n'. Print 5 lines.
         elif b <= n:
             print(df.iloc[a:b])
+        # also need to break the while loop if they don't want to see 5 more
+        # lines so need "see_more" again.
         see_more=input('\nWould you like to see more (Y/N)?: \n')
         a += 5
         b += 5
@@ -248,12 +272,15 @@ def main():
         city, month, day = get_filters()
         df = load_data(city, month, day)
 
+        # user option for statistics they want to see.  Options are filters:
         filters = ['time','station','trip duration','user','skip']
 
+        # infinite while loop to make sure value selected by user is in list
         while True:
             filter = input('SELECT STATISTICS TO OUTPUT:\nSelect "time", '\
             '"station", "trip duration", "user" or press "skip": ')
 
+            # match filter value to appropriate function.
             if filter in filters:
 
                 if filter.lower() == 'time':
@@ -274,6 +301,7 @@ def main():
             else:
                 print('\nSorry, that is not a valid option. Check spelling')
 
+        #call raw input function
         display_data(df)
 
         restart = input('\nWould you like to restart (Y/N)?: ')

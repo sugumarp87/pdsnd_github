@@ -135,10 +135,12 @@ def time_stats(df):
 
     # In order to display AM and PM, I added this conditional to print AM for
     # values less than 12 and for over 13, subtract 12 for PM.
-    if most_hour < 13:
+    if most_hour < 12:
+        print('Most frequent travel hour: {}am'.format(most_hour))
+    elif most_hour >= 13:
         print('Most frequent travel hour: {}pm'.format(most_hour-12))
     else:
-        print('Most frequent travel hour: {}am'.format(most_hour))
+        print('Most frequent travel hour: {}pm'.format(most_hour))
 
     print("\nCalculation time: %s seconds." % (time.time() - start_time))
     print('-'*40)
